@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, useHistory } from 'react-router-dom'
+
 import { useAppSelector } from 'redux/hooks'
 
 import RegisterForm from 'components/auth/RegisterForm'
@@ -6,7 +8,13 @@ import { BigLoading } from 'components/global/Loading'
 
 
 const Register = () => {
-  const { loading } = useAppSelector(state => state.auth)
+  const { loading, currentUser } = useAppSelector(state => state.auth)
+  const history = useHistory()
+
+  useEffect(() => {
+    if(currentUser) return history.replace('/')
+  },[history, currentUser])
+
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-6rem)]">
       <div className="container max-w-md p-5 shadow">
