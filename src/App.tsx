@@ -1,32 +1,42 @@
-import React, { useEffect } from 'react'
 import Header from 'components/header'
-import { BrowserRouter, Switch, Route} from 'react-router-dom'
+import { useEffect } from 'react'
+import { Switch, Route, useHistory } from 'react-router-dom'
+
 import PageRender from './PageRender'
 
-import { useAppDispatch, useAppSelector } from 'redux/hooks'
-import { useDispatch, useSelector } from 'react-redux'
-import { addUser } from 'redux/slice/authSlice'
-import { RootState } from 'redux/store'
+import { onAuthStateChanged, sendEmailVerification, signOut } from 'firebase/auth'
+import { auth } from 'Firebase'
+
 
 const App = () => {
-  const { currentUser, loading } =useAppSelector(state => state.auth)
-  const dispatch =useAppDispatch()
+
+  const history = useHistory()
 
   useEffect(() => {
-    dispatch(addUser({name: 'Ryowu'}))
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if(user){
+        if(!user.emailVerified){
+          await sendEmailVerification(user)
+          await signOut(auth)
+          return history.push("/email_verified");
+        }
+
+        console.log(user)
+      }
+    })
+
+    return unsubscribe;
   },[])
 
-  console.log({currentUser, loading})
-
   return (
-    <BrowserRouter>
+    <div>
       <Header />
       <Switch>
         <Route path="/" component={PageRender} exact />
         <Route path="/:page" component={PageRender} exact />
         <Route path="/:page/:id" component={PageRender} exact />
       </Switch>
-    </BrowserRouter>
+    </div>
   )
 }
 
