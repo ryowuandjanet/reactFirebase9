@@ -21,10 +21,10 @@ const InputFiles: React.FC<IProps> = ({multiple, files, setFiles}) => {
     checkImages(files)
   }
 
-  const checkImages = (files: FileList) => {
+  const checkImages = (fls: FileList) => {
     let newFiles: File[] = []
 
-    Array.from(files).map(file => {
+    Array.from(fls).map(file => {
       if(!file) return toast.error("File does not exist.")
 
       const types = ['image/png', 'image/jpeg', 'image/gif']
@@ -36,10 +36,14 @@ const InputFiles: React.FC<IProps> = ({multiple, files, setFiles}) => {
         return toast.error("The largest image size is 1mb.")
       }
 
-      newFiles.push(file)
+      return newFiles.push(file)
     })
+    if(multiple){
+      setFiles([...files, ...newFiles])
+    }else{
+      setFiles(newFiles)
+    }
 
-    setFiles(newFiles)
   }
 
   const allowDrag = (e: DragEvent) => {
@@ -71,6 +75,7 @@ const InputFiles: React.FC<IProps> = ({multiple, files, setFiles}) => {
         open={modal} 
         setOpen={setModal}
         multiple={multiple}
+        files={files}
         setFiles={setFiles}
         />
       }
